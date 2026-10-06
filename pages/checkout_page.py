@@ -16,6 +16,8 @@ class CheckoutPage(BasePage):
         # step 2 - overview
         self.item_prices = page.locator(".cart_item .inventory_item_price")
         self.subtotal_label = page.locator(".summary_subtotal_label")
+        self.tax_label = page.locator(".summary_tax_label")
+        self.total_label = page.locator(".summary_total_label")
         self.finish_button = page.locator("#finish")
         # step 3 - complete
         self.complete_header = page.locator(".complete-header")
@@ -28,6 +30,12 @@ class CheckoutPage(BasePage):
 
     def get_subtotal(self):
         return parse_price(self.subtotal_label.inner_text())
+
+    def get_tax(self):
+        return parse_price(self.tax_label.inner_text())
+
+    def get_total(self):
+        return parse_price(self.total_label.inner_text())
 
     def get_item_prices(self):
         return [parse_price(price) for price in self.item_prices.all_inner_texts()]

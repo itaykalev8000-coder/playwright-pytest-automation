@@ -1,8 +1,5 @@
 import pytest
 
-from utils.helpers import unique_email
-from utils.test_data import NEW_USER
-
 pytestmark = pytest.mark.api
 
 
@@ -22,7 +19,9 @@ def test_verify_login_with_wrong_password(api, new_user):
 def test_verify_login_without_email(api):
     body = api.verify_login(password="Test1234!")
     assert body["responseCode"] == 400
-    assert body["message"] == "Bad request, email or password parameter is missing in POST request."
+    assert body["message"] == (
+        "Bad request, email or password parameter is missing in POST request."
+    )
 
 
 def test_get_user_details_by_email(api, new_user):
@@ -34,12 +33,12 @@ def test_get_user_details_by_email(api, new_user):
     assert user["city"] == new_user["city"]
 
 
-def test_deleted_user_cannot_log_in(api):
-    user = {**NEW_USER, "email": unique_email()}
-    assert api.create_account(user)["responseCode"] == 201
+def test_deleted_user_cannot_log_in(api, user_factory):
+    user = user_factory()
 
     body = api.delete_account(user["email"], user["password"])
     assert body["responseCode"] == 200
+    user_factory.forget(user)  # it's gone, nothing left for teardown
     assert body["message"] == "Account deleted!"
 
     assert api.verify_login(user["email"], user["password"])["responseCode"] == 404
