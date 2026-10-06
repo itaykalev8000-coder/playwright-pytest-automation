@@ -15,10 +15,14 @@ def test_login_with_valid_user(login_page):
 
 
 @pytest.mark.parametrize(
-    "username, password, expected_error",
+    ("username", "password", "expected_error"),
     [
         (LOCKED_OUT_USER, PASSWORD, "Sorry, this user has been locked out"),
-        (STANDARD_USER, "wrong_password", "Username and password do not match any user in this service"),
+        (
+            STANDARD_USER,
+            "wrong_password",
+            "Username and password do not match any user in this service",
+        ),
         ("", PASSWORD, "Username is required"),
         (STANDARD_USER, "", "Password is required"),
     ],

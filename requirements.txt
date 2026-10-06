@@ -1,3 +1,7 @@
-pytest>=8.0
-pytest-playwright>=0.5
-allure-pytest>=2.13
+# pinned so a new release can't break the suite without a code change
+pytest==9.1.1
+pytest-playwright==0.9.0
+playwright==1.56.0
+pytest-xdist==3.8.0
+allure-pytest==2.16.2
+ruff==0.14.0

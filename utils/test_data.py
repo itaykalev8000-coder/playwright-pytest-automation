@@ -1,3 +1,5 @@
+import os
+
 # SauceDemo users - all of them share the same password
 PASSWORD = "secret_sauce"
 STANDARD_USER = "standard_user"
@@ -9,7 +11,8 @@ BIKE_LIGHT = "Sauce Labs Bike Light"
 
 CUSTOMER = {"first_name": "Dana", "last_name": "Levi", "postal_code": "7403201"}
 
-API_BASE_URL = "https://automationexercise.com"
+# override with the API_BASE_URL env var, e.g. to point at a staging copy
+API_BASE_URL = os.environ.get("API_BASE_URL", "https://automationexercise.com")
 
 # body for the createAccount endpoint, the email is generated per test
 NEW_USER = {

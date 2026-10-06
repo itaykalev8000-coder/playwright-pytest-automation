@@ -1,3 +1,5 @@
+import warnings
+
 import pytest
 
 from api_client.automation_exercise import AutomationExerciseApi
@@ -13,10 +15,31 @@ def api(playwright):
 
 
 @pytest.fixture
-def new_user(api):
-    """Registers a fresh user for the test and deletes it at the end."""
-    user = {**NEW_USER, "email": unique_email()}
-    body = api.create_account(user)
-    assert body["responseCode"] == 201, body
-    yield user
-    api.delete_account(user["email"], user["password"])
+def user_factory(api):
+    """Registers fresh users for a test and deletes whatever is left at the end.
+
+    A test that deletes the user itself calls `forget(user)` so teardown skips it.
+    """
+    created = []
+
+    def create():
+        user = {**NEW_USER, "email": unique_email()}
+        body = api.create_account(user)
+        assert body["responseCode"] == 201, body
+        created.append(user)
+        return user
+
+    create.forget = created.remove
+    yield create
+
+    for user in created:
+        body = api.delete_account(user["email"], user["password"])
+        # a failed cleanup shouldn't fail the test, but it must not be silent either
+        if body.get("responseCode") != 200:
+            warnings.warn(f"could not delete test user {user['email']}: {body}", stacklevel=1)
+
+
+@pytest.fixture
+def new_user(user_factory):
+    """A single registered user, deleted at the end of the test."""
+    return user_factory()

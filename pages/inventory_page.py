@@ -26,6 +26,10 @@ class InventoryPage(BasePage):
     def get_item_prices(self):
         return [parse_price(price) for price in self.item_prices.all_inner_texts()]
 
+    def get_price_of(self, product_name):
+        product = self.items.filter(has_text=product_name)
+        return parse_price(product.locator(".inventory_item_price").inner_text())
+
     def add_to_cart(self, product_name):
         product = self.items.filter(has_text=product_name)
         product.get_by_role("button", name="Add to cart").click()

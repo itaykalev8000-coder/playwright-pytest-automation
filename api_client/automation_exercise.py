@@ -1,6 +1,10 @@
 from playwright.sync_api import APIRequestContext, APIResponse
 
 
+class ApiError(Exception):
+    """The HTTP layer itself failed (not 200), as opposed to an error in the body."""
+
+
 class AutomationExerciseApi:
     """Client for https://automationexercise.com/api_list
 
@@ -14,8 +18,12 @@ class AutomationExerciseApi:
 
     @staticmethod
     def _body(response: APIResponse):
-        # if the HTTP status itself ever stops being 200 we want to know about it
-        assert response.ok, f"Unexpected HTTP {response.status} for {response.url}"
+        # if the HTTP status itself ever stops being 200 we want to know about it.
+        # raise instead of assert: asserts are stripped when Python runs with -O
+        if not response.ok:
+            raise ApiError(
+                f"Unexpected HTTP {response.status} for {response.url}: {response.text()[:200]}"
+            )
         return response.json()
 
     def get_products(self):
